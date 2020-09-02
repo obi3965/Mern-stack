@@ -13,7 +13,7 @@ exports.getEventById = async (req,res) =>{
         })
     } catch (error) {
         res.status(404).json({
-            status:"user not found, do you want register instead",
+            message:"user not found, do you want register instead",
             error
         })
     }

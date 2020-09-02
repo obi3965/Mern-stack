@@ -4,36 +4,26 @@ const bcrypt = require('bcrypt')
 
 exports.createUser = async (req,res)=>{
 
-    const {firstName, lastName, email, password } = req.body
-
     try {
-        const userExist = await User.findOne({email})
-        const hasedPassword = await bcrypt.hash(password,10)
-        if(!userExist){
-            const register = new User({
-            firstName,
-            lastName,
-            email,
-            password:hasedPassword
-        })
-        const userSaved = await register.save()
-        res.status(201).send({
-        status:"user registered",
-        userSaved
-    })
-        }else{
-            return res.status(400).json({
-                status:"user already registered please login now"
+        const { email, firstName, lastName, password } = req.body
+        const existentUser = await User.findOne({ email })
+
+        if (!existentUser) {
+            const hashPassword = await bcrypt.hash(password, 10)
+            const user = await User.create({
+                email,
+                firstName,
+                lastName,
+                password: hashPassword,
             })
+            return res.json(user)
         }
-        
-    
-    } catch (error) {
-        res.status(500).json({
-            status:"user not registered please register",
-            error
+        return res.status(400).json({
+            message:
+                'email already exist!  do you want to login instead? ',
         })
-       
+    } catch (err) {
+        throw Error(`Error while Registering new user :  ${err}`)
     }
     
 }
